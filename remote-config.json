@@ -1,0 +1,38 @@
+{
+  "schema": "thoughts.remote.v1",
+  "enabled": true,
+  "minAppVersion": "1.5.0",
+  "featureFlags": {
+    "showRemoteCards": true,
+    "showRemoteNotices": true,
+    "backupImportEnabled": true,
+    "shareImageEnabled": true
+  },
+  "cards": [
+    {
+      "id": "backup-safety-001",
+      "enabled": true,
+      "surface": "settings",
+      "kind": "backup",
+      "priority": 100,
+      "title": "Protect your notes",
+      "body": "Export a backup before switching phones or clearing app data.",
+      "actionLabel": "Open Backup",
+      "action": "backup",
+      "maxShows": 8,
+      "cooldownHours": 48
+    }
+  ],
+  "notices": [
+    {
+      "id": "simple-notice-001",
+      "enabled": true,
+      "priority": 100,
+      "message": "Remote Config is working.",
+      "actionLabel": "",
+      "action": "",
+      "maxShows": 1,
+      "cooldownHours": 24
+    }
+  ]
+}
