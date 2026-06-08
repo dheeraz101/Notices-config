@@ -1,12 +1,20 @@
 {
   "schema": "thoughts.remote.v1",
   "enabled": true,
-  "minAppVersion": "1.5.0",
+  "minAppVersion": "2.3.0",
+  "lastUpdated": "2026-06-08",
   "featureFlags": {
     "showRemoteCards": true,
     "showRemoteNotices": true,
     "backupImportEnabled": true,
     "shareImageEnabled": true
+  },
+  "copyOverrides": {
+    "virusTotalScore": "67/67 clean",
+    "virusTotalApkName": "thoughts-universal-release.apk",
+    "virusTotalHash": "7710947142c04b548eb663d285e4cfe255c4153d573fcbbd8be79109cb2a54ad",
+    "virusTotalUpdatedAt": "June 8, 2026",
+    "virusTotalUrl": "https://www.virustotal.com/gui/file/7710947142c04b548eb663d285e4cfe255c4153d573fcbbd8be79109cb2a54ad"
   },
   "cards": [
     {
