@@ -8,8 +8,11 @@
     "showRemoteNotices": true,
     "showKnownIssues": true,
     "remoteTipsEnabled": true,
+
     "backupImportEnabled": true,
-    "shareImageEnabled": true
+    "shareImageEnabled": true,
+
+    "factoryResetEnabled": false
   },
   "copyOverrides": {
     "virusTotalScore": "68/68 clean",
@@ -20,29 +23,29 @@
   },
   "cards": [
     {
-      "id": "factory-reset-known-issue-230-005",
+      "id": "factory-reset-known-issue-230-001",
       "enabled": true,
       "surface": "settings",
       "kind": "warning",
       "priority": 999,
-      "title": "Factory Reset issue",
-      "body": "Avoid Factory Reset in v2.2.0 and v2.3.0. Export a backup before clearing app data.",
+      "title": "Factory Reset is temporarily disabled",
+      "body": "Factory Reset has a known issue in v2.2.0 and v2.3.0. Do not use it for now. Export a backup before changing devices or clearing app data.",
       "actionLabel": "Open Backup",
       "action": "backup",
       "maxShows": 20,
-      "cooldownHours": 1
+      "cooldownHours": 6
     }
   ],
   "notices": [
     {
-      "id": "factory-reset-warning-230-005",
-      "enabled": true,
+      "id": "factory-reset-warning-230-001",
+      "enabled": false,
       "priority": 999,
-      "message": "Known issue: avoid Factory Reset. Export a backup instead.",
+      "message": "Known issue: avoid Factory Reset in v2.2.0/v2.3.0. Export a backup instead.",
       "actionLabel": "Backup",
       "action": "backup",
       "maxShows": 5,
-      "cooldownHours": 1
+      "cooldownHours": 12
     }
   ]
 }
