@@ -27,11 +27,11 @@
   },
   "copyOverrides": {
     "virusTotalVersion": "2.4.0",
-    "virusTotalScore": "68/68 clean",
+    "virusTotalScore": "67/67 clean",
     "virusTotalApkName": "thoughts-universal-release.apk",
-    "virusTotalHash": "ed757b0b1a68f49773fba6b57300e962985b2574ef4b1257a768d4c7b74d8f33",
+    "virusTotalHash": "7d327784bbe88a7b9e5e095bb4bbadc1acacff6452225abf77411872e39d921a",
     "virusTotalUpdatedAt": "June 9, 2026",
-    "virusTotalUrl": "https://www.virustotal.com/gui/file/ed757b0b1a68f49773fba6b57300e962985b2574ef4b1257a768d4c7b74d8f33"
+    "virusTotalUrl": "https://www.virustotal.com/gui/file/7d327784bbe88a7b9e5e095bb4bbadc1acacff6452225abf77411872e39d921a"
   },
   "cards": [
     {
