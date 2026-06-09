@@ -1,132 +1,35 @@
-# Thoughts Remote Config v1 — Complete Usage & Safety Guide
+# Thoughts Remote Config v1 Guide
 
-This guide explains how to use `remote_config.json` for Thoughts Android.
+This file documents the live-content format supported by the current `lib/main.dart`.
 
-Remote Config is for safe live content and controlled feature flags. It can change content, show cards, show notices, override selected copy, and disable selected non-sensitive features. It cannot add new Flutter code, native Android features, permissions, storage logic, encryption, widgets, or destructive behavior unless that behavior already exists inside the installed APK.
+Remote Config is for safe live content, copy fixes, modal safety notices, and disabling already-built app features. It cannot add new Flutter code, run remote code, read notes, upload data, or perform destructive actions that are not already built into the APK.
 
-## Core rule
+## Current Behavior
 
-Remote Config can control data and presentation. It must not control private user data, destructive actions, App Lock, screen protection, or database behavior.
+- The app fetches remote config on startup and app resume.
+- App resume uses force refresh so urgent safety changes are checked quickly.
+- Normal non-forced refresh cooldown is 10 minutes.
+- A successful response is cached for offline fallback.
+- `enabled: false` clears remote flags, cards, copy, and notices from app state.
+- Remote notices are shown as modal popups, not undo/top notices.
+- High-priority notices with `priority >= 100` bypass local show history and cooldown.
+- Up to three safe action buttons can be shown in one remote notice.
+- Remote config can disable features, but it cannot enable dangerous behavior.
 
-Safe:
-- Show a card.
-- Show a notice.
-- Change selected help text.
-- Disable a non-sensitive UI action temporarily.
-- Link to a trusted page.
-- Open prebuilt safe app actions such as Backup, Updates, Guides, or Compose.
-
-Unsafe:
-- Delete notes.
-- Clear Recently Deleted.
-- Disable App Lock.
-- Disable protected screen previews.
-- Switch writing spaces.
-- Import backups automatically.
-- Run remote code.
-- Render arbitrary HTML.
-- Execute JavaScript.
-- Add native Android permissions.
-- Change encryption logic remotely.
-
-## File location
-
-Recommended GitHub raw URL:
-
-```text
-https://raw.githubusercontent.com/dheeraz101/webstore-thoughts/refs/heads/main/remote_config.json
-```
-
-Your app should fetch this URL, cache the successful response, and use cached config when offline.
-
-## Minimal valid file
+## Minimal Valid File
 
 ```json
 {
   "schema": "thoughts.remote.v1",
   "enabled": true,
-  "minAppVersion": "1.5.0",
-  "lastUpdated": "2026-06-05"
+  "minAppVersion": "2.3.0",
+  "lastUpdated": "2026-06-09"
 }
 ```
 
-This does nothing visible, but it is valid.
+## Supported Feature Flags
 
-## Complete structure
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "minAppVersion": "1.5.0",
-  "lastUpdated": "2026-06-05",
-  "featureFlags": {},
-  "copyOverrides": {},
-  "cards": [],
-  "notices": []
-}
-```
-
-## Root fields
-
-### `schema`
-
-Required.
-
-```json
-"schema": "thoughts.remote.v1"
-```
-
-The app ignores the file if this does not match exactly.
-
-### `enabled`
-
-Optional. Defaults to enabled if missing.
-
-```json
-"enabled": true
-```
-
-Set to false to make the app ignore the config:
-
-```json
-"enabled": false
-```
-
-### `minAppVersion`
-
-Optional.
-
-```json
-"minAppVersion": "1.5.0"
-```
-
-If the installed app version is older than this, it ignores the config. Use this when remote cards require code added in a newer APK.
-
-### `lastUpdated`
-
-Informational. Use ISO date.
-
-```json
-"lastUpdated": "2026-06-05"
-```
-
-## Feature flags
-
-Feature flags are boolean switches for safe, prebuilt behavior.
-
-Example:
-
-```json
-"featureFlags": {
-  "showRemoteCards": true,
-  "showRemoteNotices": true,
-  "backupImportEnabled": true,
-  "shareImageEnabled": true
-}
-```
-
-Supported flags in v1:
+All flags are booleans. Missing flags use the app fallback.
 
 ```text
 showRemoteCards
@@ -134,60 +37,37 @@ showRemoteNotices
 showKnownIssues
 showWritingPrompts
 showReleaseHighlight
-backupImportEnabled
-shareImageEnabled
-launchKeyboardCardEnabled
 remoteTipsEnabled
 appLinksCardEnabled
+launchKeyboardCardEnabled
+
+factoryResetEnabled
+dataResetEnabled
+minimalModeEnabled
+backupImportEnabled
+backupExportEnabled
+encryptedBackupExportEnabled
+testBackupEnabled
+shareImageEnabled
+appLockEnabled
+screenProtectionEnabled
+appIconSwitchingEnabled
+updateChecksEnabled
+importantNoticesEnabled
 ```
 
-### `showRemoteCards`
+### Standard Disable UX
 
-Controls whether remote cards appear.
+If a live config disables an active feature, the app should explain it with a modal:
 
-```json
-"showRemoteCards": true
-```
+- Minimal Mode is exited and the user is told it was disabled by a live safety notice.
+- App Lock is turned off and the user is told it was disabled by a live safety notice.
+- Screen Protection is turned off and the user is told it was disabled by a live safety notice.
+- Important Notices are turned off and the user is told it was disabled by a live safety notice.
 
-Set false to hide all remote cards:
+For other disabled features, rows/buttons show unavailable copy and block the action.
 
-```json
-"showRemoteCards": false
-```
-
-### `showRemoteNotices`
-
-Controls whether remote in-app notices can appear.
-
-```json
-"showRemoteNotices": true
-```
-
-### `backupImportEnabled`
-
-Safe kill switch for Import Backup.
-
-```json
-"backupImportEnabled": false
-```
-
-When false, the app should show Import Backup as temporarily unavailable.
-
-### `shareImageEnabled`
-
-Safe kill switch for Share as Image.
-
-```json
-"shareImageEnabled": false
-```
-
-When false, the app should prevent image sharing and show a short notice.
-
-## Copy overrides
-
-Copy overrides let you safely replace specific text strings without publishing a new APK.
-
-Supported copy keys in v1:
+## Supported Copy Overrides
 
 ```text
 backupGuideText
@@ -196,75 +76,90 @@ settingsNoticeSubtitle
 appLinksHelpText
 privacyReminderText
 releaseHighlightText
+virusTotalVersion
+virusTotalApkName
+virusTotalHash
+virusTotalScore
+virusTotalUpdatedAt
+virusTotalUrl
 ```
 
-Example:
+Copy values are capped by the app. Keep them short, calm, and factual.
+
+## Safe Actions
+
+Remote cards, notices, and notice actions may use:
+
+```text
+home
+open
+settings
+privacy
+privacy-security
+privacy-policy
+experience
+appearance
+accessibility
+app-lock
+applock
+health
+diagnostics
+updates
+update
+releases
+notifications
+notices
+about
+guides
+whats-new
+whatsnew
+changelog
+release-notes
+language
+languages
+language-store
+backup
+compose
+new
+note
+github
+dismiss
+```
+
+Trusted HTTPS hosts:
+
+```text
+writethoughts.netlify.app
+github.com
+raw.githubusercontent.com
+dheeraz.netlify.app
+www.virustotal.com
+virustotal.com
+```
+
+Do not use arbitrary URLs.
+
+## Remote Cards
+
+Cards are small Settings cards. Keep them short.
 
 ```json
-"copyOverrides": {
-  "backupGuideText": "Your notes stay on this device. Export a backup before switching phones, clearing app data, or reinstalling."
+{
+  "id": "factory-reset-known-issue-230-002",
+  "enabled": true,
+  "surface": "settings",
+  "kind": "warning",
+  "priority": 999,
+  "title": "Factory Reset is temporarily disabled",
+  "body": "Factory Reset has a known issue in older v2.3.0 test builds. Export a backup before clearing app data.",
+  "actionLabel": "Open Backup",
+  "action": "backup",
+  "maxShows": 20,
+  "cooldownHours": 6
 }
 ```
 
-Rules:
-- Use only approved keys.
-- Keep values short.
-- Do not include private user data.
-- Do not include scary or manipulative copy.
-- Do not use raw HTML.
-- Do not include tracking links.
-
-## Remote cards
-
-Remote cards are small UI cards shown in safe surfaces such as Settings.
-
-Example:
-
-```json
-"cards": [
-  {
-    "id": "backup-safety-001",
-    "enabled": true,
-    "surface": "settings",
-    "kind": "backup",
-    "priority": 100,
-    "title": "Protect your notes",
-    "body": "Thoughts stores notes locally. Export a backup before switching phones or clearing app data.",
-    "actionLabel": "Open Backup",
-    "action": "backup",
-    "maxShows": 8,
-    "cooldownHours": 48
-  }
-]
-```
-
-### Card fields
-
-#### `id`
-
-Required. Must be unique and stable.
-
-```json
-"id": "backup-safety-001"
-```
-
-Change the ID if you want the card to be treated as a new campaign.
-
-#### `enabled`
-
-Optional.
-
-```json
-"enabled": true
-```
-
-Set false to disable the card without deleting it.
-
-#### `surface`
-
-Where the card appears.
-
-Supported v1 surfaces:
+Supported surfaces:
 
 ```text
 settings
@@ -273,12 +168,6 @@ updates
 privacy
 backup
 ```
-
-Your current implementation renders `settings`. Other surfaces should be added only when the app UI has a safe place for them.
-
-#### `kind`
-
-Controls icon/style.
 
 Supported kinds:
 
@@ -291,508 +180,100 @@ release
 issue
 ```
 
-#### `priority`
+## Remote Notices
 
-Higher priority appears first.
+Remote notices are modal popups with OK/Cancel and optional action buttons.
 
-```json
-"priority": 100
-```
-
-Use ranges:
-- 100: important safety / backup card
-- 80: prompt / release highlight
-- 40: known issue / informational
-- 10: small tip
-
-#### `title`
-
-Short title. Recommended under 70 characters.
-
-#### `body`
-
-Short body text. Recommended under 220 characters.
-
-#### `actionLabel`
-
-Button/action label. Keep under 32 characters.
-
-#### `action`
-
-Safe action to run when tapped.
-
-Supported safe actions:
-
-```text
-compose
-new
-note
-backup
-settings
-updates
-update
-notifications
-notices
-about
-guides
-whats-new
-whatsnew
-changelog
-release-notes
-github
-home
-open
-dismiss
-```
-
-Trusted HTTPS URLs may be allowed only for these hosts:
-
-```text
-writethoughts.netlify.app
-github.com
-raw.githubusercontent.com
-dheeraz.netlify.app
-```
-
-Do not use arbitrary URLs.
-
-#### `maxShows`
-
-Maximum times this card can be shown/tapped before it stops appearing.
-
-Recommended:
-- Important backup card: 5–8
-- Known issue card: 3–4
-- Writing prompt: 1–5
-
-#### `cooldownHours`
-
-Minimum hours between appearances.
-
-Recommended:
-- Backup reminder: 48–72
-- Prompt: 24–72
-- Known issue: 96–168
-
-## Remote notices
-
-Remote notices are small in-app notification pills.
-
-Example:
-
-```json
-"notices": [
-  {
-    "id": "backup-reminder-remote-001",
-    "enabled": true,
-    "priority": 100,
-    "message": "Your notes stay local. Export a backup before switching phones.",
-    "actionLabel": "Backup",
-    "action": "backup",
-    "maxShows": 2,
-    "cooldownHours": 72
-  }
-]
-```
-
-### Notice fields
-
-#### `id`
-
-Required, unique, stable.
-
-#### `enabled`
-
-Set false to disable.
-
-#### `priority`
-
-Higher appears first.
-
-#### `message`
-
-Short notice text. Recommended under 160 characters.
-
-#### `actionLabel`
-
-Optional label for the action.
-
-#### `action`
-
-Optional safe action. Use empty string for no action:
-
-```json
-"action": ""
-```
-
-If action is empty, it should still be allowed to show as a message-only notice.
-
-#### `maxShows`
-
-Maximum displays.
-
-Recommended: 1–3.
-
-#### `cooldownHours`
-
-Recommended: 48–168.
-
-## Real-world use cases
-
-### 1. Disable a broken feature temporarily
+Legacy single-action format is still supported:
 
 ```json
 {
-  "schema": "thoughts.remote.v1",
+  "id": "backup-notice-001",
   "enabled": true,
-  "minAppVersion": "1.5.0",
-  "featureFlags": {
-    "backupImportEnabled": false
-  }
+  "title": "Backup reminder",
+  "priority": 80,
+  "message": "Your notes stay local. Export a backup before switching phones.",
+  "actionLabel": "Backup",
+  "action": "backup",
+  "maxShows": 2,
+  "cooldownHours": 72
 }
 ```
 
-Use when Import Backup has a bug and you need to prevent damage until the next APK.
-
-### 2. Show a backup safety card
+New multi-action format:
 
 ```json
 {
-  "schema": "thoughts.remote.v1",
+  "id": "factory-reset-warning-230-002",
   "enabled": true,
-  "minAppVersion": "1.5.0",
-  "cards": [
-    {
-      "id": "backup-safety-001",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "backup",
-      "priority": 100,
-      "title": "Protect your notes",
-      "body": "Export a backup before switching phones, clearing app data, or reinstalling.",
-      "actionLabel": "Open Backup",
-      "action": "backup",
-      "maxShows": 8,
-      "cooldownHours": 48
-    }
-  ]
-}
-```
-
-### 3. Show a writing prompt
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "cards": [
-    {
-      "id": "prompt-001",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "prompt",
-      "priority": 80,
-      "title": "Writing prompt",
-      "body": "What thought have you been avoiding because it feels too honest?",
-      "actionLabel": "Write",
-      "action": "compose",
-      "maxShows": 5,
-      "cooldownHours": 72
-    }
-  ]
-}
-```
-
-### 4. Show a known issue
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "cards": [
-    {
-      "id": "known-issue-applinks-001",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "issue",
-      "priority": 40,
-      "title": "App Links note",
-      "body": "Some devices may open shared links in the browser until Android verifies the app link.",
-      "actionLabel": "Updates",
-      "action": "updates",
-      "maxShows": 4,
-      "cooldownHours": 96
-    }
-  ]
-}
-```
-
-### 5. Show a release highlight
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "cards": [
-    {
-      "id": "release-highlight-150",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "release",
-      "priority": 90,
-      "title": "App Links are here",
-      "body": "Supported shared links can now open Thoughts directly when installed.",
-      "actionLabel": "What’s New",
-      "action": "whats-new",
-      "maxShows": 3,
-      "cooldownHours": 72
-    }
-  ]
-}
-```
-
-### 6. Show an in-app notice only
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "notices": [
-    {
-      "id": "simple-maintenance-001",
-      "enabled": true,
-      "priority": 80,
-      "message": "Update checks may be slower today. Your notes are not affected.",
-      "actionLabel": "",
-      "action": "",
-      "maxShows": 1,
-      "cooldownHours": 168
-    }
-  ]
-}
-```
-
-### 7. Show an actionable notice
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "notices": [
-    {
-      "id": "backup-notice-001",
-      "enabled": true,
-      "priority": 100,
-      "message": "Your notes stay local. Export a backup before switching phones.",
-      "actionLabel": "Backup",
-      "action": "backup",
-      "maxShows": 2,
-      "cooldownHours": 72
-    }
-  ]
-}
-```
-
-### 8. Override guide copy
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "copyOverrides": {
-    "backupGuideText": "Your notes stay on this device. Export a backup before clearing app data, switching phones, or reinstalling."
-  }
-}
-```
-
-### 9. Disable Share as Image temporarily
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "featureFlags": {
-    "shareImageEnabled": false
-  }
-}
-```
-
-### 10. Combine card + notice + copy override
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "enabled": true,
-  "minAppVersion": "1.5.0",
-  "lastUpdated": "2026-06-05",
-  "featureFlags": {
-    "showRemoteCards": true,
-    "showRemoteNotices": true,
-    "backupImportEnabled": true,
-    "shareImageEnabled": true
-  },
-  "copyOverrides": {
-    "backupGuideText": "Your notes stay on this device. Export a backup before switching phones, clearing app data, or reinstalling."
-  },
-  "cards": [
-    {
-      "id": "backup-safety-001",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "backup",
-      "priority": 100,
-      "title": "Protect your notes",
-      "body": "Thoughts stores notes locally. Export a backup before switching phones or clearing app data.",
-      "actionLabel": "Open Backup",
-      "action": "backup",
-      "maxShows": 8,
-      "cooldownHours": 48
-    }
+  "title": "Factory Reset safety notice",
+  "priority": 100,
+  "message": "Factory Reset is temporarily disabled in this build while a reset issue is being checked. Your notes are safe. Export a backup before clearing app data.",
+  "actions": [
+    { "label": "Backup", "action": "backup" },
+    { "label": "Privacy", "action": "privacy" },
+    { "label": "Updates", "action": "updates" }
   ],
-  "notices": [
-    {
-      "id": "backup-reminder-remote-001",
-      "enabled": true,
-      "priority": 100,
-      "message": "Your notes stay local. Export a backup before switching phones.",
-      "actionLabel": "Backup",
-      "action": "backup",
-      "maxShows": 2,
-      "cooldownHours": 72
-    }
-  ]
+  "maxShows": 5,
+  "cooldownHours": 1
 }
 ```
 
-## Invalid examples
+Rules:
 
-### Invalid: dangerous action
+- `id`: required, stable, under 80 characters.
+- `title`: optional, under 70 characters.
+- `message`: required, under 320 characters.
+- `actions`: optional, max 3 buttons.
+- Each action label must be under 32 characters.
+- Each action must be safe.
+- `priority >= 100` bypasses local show history/cooldown for emergency alerts.
+- Use a new ID when you need users to see a materially new notice.
+
+## Emergency Disable Example
 
 ```json
 {
   "schema": "thoughts.remote.v1",
-  "cards": [
+  "enabled": true,
+  "minAppVersion": "2.3.0",
+  "lastUpdated": "2026-06-09",
+  "featureFlags": {
+    "factoryResetEnabled": false,
+    "showRemoteNotices": true,
+    "showRemoteCards": true
+  },
+  "notices": [
     {
-      "id": "bad-001",
+      "id": "factory-reset-warning-230-002",
       "enabled": true,
-      "surface": "settings",
-      "kind": "warning",
+      "title": "Factory Reset safety notice",
       "priority": 100,
-      "title": "Clean up",
-      "body": "Delete everything now.",
-      "actionLabel": "Delete",
-      "action": "deleteAll",
-      "maxShows": 1,
+      "message": "Factory Reset is temporarily disabled in this build while a reset issue is being checked. Export a backup before clearing app data.",
+      "actions": [
+        { "label": "Backup", "action": "backup" },
+        { "label": "Updates", "action": "updates" }
+      ],
+      "maxShows": 5,
       "cooldownHours": 1
     }
   ]
 }
 ```
 
-The app must reject `deleteAll`.
-
-### Invalid: arbitrary URL
-
-```json
-{
-  "schema": "thoughts.remote.v1",
-  "cards": [
-    {
-      "id": "bad-url-001",
-      "enabled": true,
-      "surface": "settings",
-      "kind": "info",
-      "priority": 10,
-      "title": "Open site",
-      "body": "This domain is not trusted.",
-      "actionLabel": "Open",
-      "action": "https://example.com",
-      "maxShows": 1,
-      "cooldownHours": 24
-    }
-  ]
-}
-```
-
-Only trusted domains should be allowed.
-
-### Invalid: too much content
-
-Remote cards are not blog posts. Keep them short. Large text should go into a normal app update, a guide page, or GitHub release notes.
-
-## Operational rules
+## Operational Rules
 
 1. Validate JSON before pushing.
-2. Keep old working config backed up.
+2. Keep a backup of the last working config.
 3. Change one campaign at a time.
-4. Use unique IDs for new campaigns.
-5. Do not reuse IDs unless updating the same campaign.
-6. Keep `maxShows` low.
-7. Keep `cooldownHours` high.
-8. Never use remote config to manipulate privacy or storage settings.
-9. Test with bad JSON.
-10. Test offline behavior.
-11. Test app start with no config.
-12. Test app start with cached config.
-13. Keep the file under 120 KB.
+4. Use unique IDs for new notices/cards.
+5. Use `enabled: false` to retire old campaigns.
+6. Use `priority >= 100` only for real safety issues.
+7. Use feature flags only to disable/hide built-in behavior.
+8. Do not use remote config to delete data or run destructive actions.
+9. Keep the file under 120 KB.
+10. Test app start, app resume, offline cache, and bad JSON.
 
-## Recommended publishing workflow
+## Privacy Promise
 
-1. Edit `remote_config.json`.
-2. Validate JSON using a JSON formatter.
-3. Check schema is `thoughts.remote.v1`.
-4. Confirm actions are safe.
-5. Confirm card IDs are unique.
-6. Push to GitHub.
-7. Open raw URL in browser.
-8. Wait for GitHub raw cache if needed.
-9. Test app with force refresh if you add that control.
-10. Watch for layout issues.
-
-## Version strategy
-
-Use `minAppVersion` when a card depends on new app code.
-
-Example:
-
-```json
-"minAppVersion": "1.5.0"
-```
-
-For future features requiring v1.6.0:
-
-```json
-"minAppVersion": "1.6.0"
-```
-
-## Privacy promise
-
-Remote Config only fetches a public JSON file. It must not upload notes, drafts, settings, identifiers, or user content.
-
-Suggested user-facing Settings copy:
-
-```text
-Live Content lets Thoughts show helpful notices, safety reminders, guide updates, and release highlights without requiring an app update. Your notes are never sent anywhere.
-```
-
-## Final recommendation
-
-Keep Remote Config v1 boring and strict. That is the point.
-
-Use it for:
-- helpful cards
-- notices
-- copy fixes
-- safe feature flags
-- known issues
-- release highlights
-- writing prompts
-
-Do not use it for:
-- destructive actions
-- privacy control
-- app lock control
-- database changes
-- encryption behavior
-- arbitrary URLs
-- remote code
+Remote Config fetches a public JSON file. It must not upload notes, drafts, settings, identifiers, or user content.

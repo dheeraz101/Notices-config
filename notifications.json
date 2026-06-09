@@ -1,6 +1,6 @@
 {
   "schema": "thoughts.remote-notifications.v2",
-  "updatedAt": "2026-06-03T00:00:00.000Z",
+  "updatedAt": "2026-06-09T00:00:00.000Z",
   "defaults": {
     "showInApp": true,
     "showSystem": true,
@@ -10,14 +10,13 @@
   },
   "notifications": [
     {
-      "id": "thoughts-android-welcome",
+      "id": "thoughts-android-v240-welcome-minimal-mode",
       "enabled": true,
-      "type": "release",
-      "title": "Thoughts for Android is getting native",
-      "body": "Open Updates to check GitHub releases and install the latest build.",
-      "action": "updates",
-      "startsAt": "2026-06-03T00:00:00.000Z",
-      "endsAt": "2026-06-30T23:59:59.000Z",
+      "type": "info",
+      "title": "Welcome to Thoughts 2.4.0",
+      "body": "Explore the new Minimal Mode for clean, distraction-free writing.",
+      "action": "experience",
+      "startsAt": "2026-06-09T00:00:00.000Z",
       "showAtLocal": "09:00",
       "daysOfWeek": [
         1,
@@ -28,26 +27,27 @@
         6,
         7
       ],
-      "maxShows": 2,
-      "cooldownHours": 48,
-      "priority": 30,
+      "maxShows": 1,
+      "cooldownHours": 24,
+      "priority": 80,
       "showInApp": true,
       "showSystem": true
     },
     {
-      "id": "factory-reset-known-issue-230",
+      "id": "thoughts-weekly-backup-reminder-v240",
       "enabled": true,
-      "type": "warning",
-      "title": "Factory Reset issue in Thoughts",
-      "body": "Avoid Factory Reset in v2.2.0/v2.3.0 for now. Export a backup before clearing app data.",
+      "type": "backup",
+      "title": "Keep a fresh backup",
+      "body": "Your notes stay on this device. Export a backup once a week to avoid losing them.",
       "action": "backup",
-      "startsAt": "2026-06-08T00:00:00.000Z",
-      "endsAt": "2026-06-30T23:59:59.000Z",
-      "showAtLocal": "10:00",
-      "daysOfWeek": [1, 2, 3, 4, 5, 6, 7],
-      "maxShows": 3,
-      "cooldownHours": 24,
-      "priority": 100,
+      "startsAt": "2026-06-09T00:00:00.000Z",
+      "showAtLocal": "09:00",
+      "daysOfWeek": [
+        7
+      ],
+      "maxShows": 52,
+      "cooldownHours": 168,
+      "priority": 50,
       "showInApp": true,
       "showSystem": true
     }

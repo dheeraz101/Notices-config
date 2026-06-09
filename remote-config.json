@@ -1,51 +1,72 @@
 {
   "schema": "thoughts.remote.v1",
   "enabled": true,
-  "minAppVersion": "2.2.0",
-  "lastUpdated": "2026-06-08",
+  "minAppVersion": "2.4.0",
+  "lastUpdated": "2026-06-09",
   "featureFlags": {
     "showRemoteCards": true,
     "showRemoteNotices": true,
-    "showKnownIssues": true,
+    "showKnownIssues": false,
+    "showWritingPrompts": false,
+    "showReleaseHighlight": true,
     "remoteTipsEnabled": true,
-
+    "appLinksCardEnabled": true,
+    "launchKeyboardCardEnabled": true,
+    "dataResetEnabled": true,
+    "minimalModeEnabled": true,
     "backupImportEnabled": true,
+    "backupExportEnabled": true,
+    "encryptedBackupExportEnabled": true,
+    "testBackupEnabled": true,
     "shareImageEnabled": true,
-
-    "factoryResetEnabled": false
+    "appLockEnabled": true,
+    "screenProtectionEnabled": true,
+    "appIconSwitchingEnabled": true,
+    "updateChecksEnabled": true,
+    "importantNoticesEnabled": true
   },
   "copyOverrides": {
+    "virusTotalVersion": "2.4.0",
     "virusTotalScore": "68/68 clean",
     "virusTotalApkName": "thoughts-universal-release.apk",
-    "virusTotalHash": "7d8e3e70b68da51ebe9c582d88c3e920da2445ccc9a4b20da5d80b69fce98e22",
+    "virusTotalHash": "ed757b0b1a68f49773fba6b57300e962985b2574ef4b1257a768d4c7b74d8f33",
     "virusTotalUpdatedAt": "June 8, 2026",
-    "virusTotalUrl": "https://www.virustotal.com/gui/file/7d8e3e70b68da51ebe9c582d88c3e920da2445ccc9a4b20da5d80b69fce98e22"
+    "virusTotalUrl": "https://www.virustotal.com/gui/file/ed757b0b1a68f49773fba6b57300e962985b2574ef4b1257a768d4c7b74d8f33"
   },
   "cards": [
     {
-      "id": "factory-reset-known-issue-230-001",
+      "id": "support-thoughts-buy-me-coffee-v240",
       "enabled": true,
       "surface": "settings",
-      "kind": "warning",
-      "priority": 999,
-      "title": "Factory Reset is temporarily disabled",
-      "body": "Factory Reset has a known issue in v2.2.0 and v2.3.0. Do not use it for now. Export a backup before changing devices or clearing app data.",
-      "actionLabel": "Open Backup",
-      "action": "backup",
-      "maxShows": 20,
-      "cooldownHours": 6
+      "kind": "info",
+      "priority": 40,
+      "title": "Support Thoughts",
+      "body": "Thoughts is built independently with privacy at its core. If the app helps you, you can support future updates with a small coffee.",
+      "actionLabel": "Buy Me a Coffee",
+      "action": "https://www.buymeacoffee.com/dheeraz",
+      "maxShows": 10,
+      "cooldownHours": 168
     }
   ],
   "notices": [
     {
-      "id": "factory-reset-warning-230-001",
-      "enabled": false,
-      "priority": 999,
-      "message": "Known issue: avoid Factory Reset in v2.2.0/v2.3.0. Export a backup instead.",
-      "actionLabel": "Backup",
-      "action": "backup",
-      "maxShows": 5,
-      "cooldownHours": 12
+      "id": "virustotal-verification-live-v240",
+      "enabled": true,
+      "title": "Verified release safety",
+      "priority": 80,
+      "message": "Thoughts now shows VirusTotal verification inside the app, so you can check release safety without guessing. Your notes still stay local.",
+      "actions": [
+        {
+          "label": "Privacy & Security",
+          "action": "privacy-security"
+        },
+        {
+          "label": "Health Check",
+          "action": "health"
+        }
+      ],
+      "maxShows": 1,
+      "cooldownHours": 720
     }
   ]
 }
